@@ -21,6 +21,12 @@ type AnalyzeResponse = {
 const UPLOAD_DISCLAIMER =
   "Educational demo only. Not financial advice. Metrics are computed from your uploaded CSV — verify dates and prices. Past data does not predict future results.";
 
+const QUICK_TICKERS = [
+  ["BTC-USD", "Bitcoin"],
+  ["ETH-USD", "Ethereum"],
+  ["AAPL", "Apple"],
+] as const;
+
 type UploadedStock = {
   id: string;
   ticker: string;
@@ -29,7 +35,7 @@ type UploadedStock = {
 };
 
 export default function Home() {
-  const [ticker, setTicker] = useState("AAPL");
+  const [ticker, setTicker] = useState("BTC-USD");
   const [horizon, setHorizon] = useState<Horizon>("1m");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
@@ -126,9 +132,10 @@ export default function Home() {
             AI trend explorer
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400">
-            Run <strong>demo math</strong> on a ticker, or <strong>upload CSV history</strong>{" "}
-            (e.g. Yahoo export) and analyze that symbol with simple momentum / vol / RSI — all
-            in the browser except the mock fallback.
+            Run <strong>demo math</strong> on equities or <strong>crypto pairs</strong> (e.g.{" "}
+            <code className="font-mono text-sm">BTC-USD</code> for Bitcoin vs USD), or{" "}
+            <strong>upload CSV history</strong> — momentum / vol / RSI style readouts are
+            illustrative unless you use your own file.
           </p>
         </header>
 
@@ -242,11 +249,28 @@ export default function Home() {
               name="ticker"
               value={ticker}
               onChange={(e) => setTicker(e.target.value.toUpperCase())}
-              placeholder="e.g. MSFT"
+              placeholder="e.g. BTC-USD, AAPL"
               className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 font-mono text-sm outline-none ring-emerald-500/0 transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 dark:border-zinc-600 dark:bg-zinc-950"
               maxLength={12}
               autoComplete="off"
             />
+            <div className="flex flex-wrap gap-2 pt-1">
+              <span className="w-full text-xs text-zinc-500 dark:text-zinc-400">Quick pick</span>
+              {QUICK_TICKERS.map(([sym, label]) => (
+                <button
+                  key={sym}
+                  type="button"
+                  onClick={() => setTicker(sym)}
+                  className={`rounded-full border px-3 py-1 text-xs transition ${
+                    ticker === sym
+                      ? "border-orange-600 bg-orange-600 text-white dark:border-orange-500 dark:bg-orange-600"
+                      : "border-zinc-300 bg-zinc-50 hover:border-zinc-400 dark:border-zinc-600 dark:bg-zinc-800"
+                  }`}
+                >
+                  {label} ({sym})
+                </button>
+              ))}
+            </div>
             {uploads.length > 0 && !hasUploadForTicker && (
               <p className="text-xs text-amber-800 dark:text-amber-200/90">
                 No uploaded file uses this ticker yet — analysis will use the built-in demo, or

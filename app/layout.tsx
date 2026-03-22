@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stock AI trend explorer",
+  title: "Stock & crypto trend explorer",
   description:
-    "Educational demo: explore mock trend-style signals with optional AI narration — not financial advice.",
+    "Educational demo: mock trend-style signals for stocks or pairs like BTC-USD — not financial advice.",
 };
 
 export default function RootLayout({

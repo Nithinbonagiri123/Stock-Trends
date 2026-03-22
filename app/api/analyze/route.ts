@@ -33,17 +33,9 @@ export async function POST(req: Request) {
 
   const mock = buildMockAnalysis(ticker, horizon);
 
-  const summary =
-    mock.sentiment === "bullish"
-      ? "In this demo model, momentum tilts slightly positive — still meaningless for real trading."
-      : mock.sentiment === "bearish"
-        ? "In this demo model, momentum tilts slightly negative — purely illustrative."
-        : "In this demo model, readings sit near the middle — no real forecast implied.";
-
   return NextResponse.json({
     disclaimer:
       "Educational demo only. Not financial advice. Mock data — not live market data. Past or simulated patterns do not predict future results.",
     ...mock,
-    summary,
   });
 }

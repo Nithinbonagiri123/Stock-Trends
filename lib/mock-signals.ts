@@ -26,10 +26,16 @@ function mulberry32(seed: number) {
   };
 }
 
+function isCryptoUsdPair(symbol: string): boolean {
+  return /^[A-Z0-9]{2,}-USD$/i.test(symbol.trim());
+}
+
 export function buildMockAnalysis(ticker: string, horizon: Horizon) {
   const upper = ticker.trim().toUpperCase();
   const seed = hashString(upper + horizon);
   const rnd = mulberry32(seed);
+  const crypto = isCryptoUsdPair(upper);
+  const btc = upper.startsWith("BTC");
 
   const momentum = (rnd() * 40 - 20).toFixed(1);
   const vol = (rnd() * 35 + 10).toFixed(0);
@@ -38,29 +44,68 @@ export function buildMockAnalysis(ticker: string, horizon: Horizon) {
   const sentiment =
     Number(momentum) > 5 ? "bullish" : Number(momentum) < -5 ? "bearish" : "neutral";
 
+  const momLabel = btc
+    ? "Mock momentum — Bitcoin / USD (demo)"
+    : crypto
+      ? "Mock momentum — crypto / USD (demo)"
+      : "Mock momentum (demo)";
+  const momDetail = crypto
+    ? "Illustrative only — not spot or live crypto prices."
+    : "Illustrative only — not calculated from live prices.";
+  const volDetail = crypto
+    ? "Toy volatility read for a crypto pair — not on-chain or exchange data."
+    : "Higher = more swing risk in this toy model.";
+  const rsiDetail = crypto
+    ? "Educational placeholder for a USD-quoted pair — not a trade signal."
+    : "Educational placeholder, not a trading signal.";
+
   const signals: TrendSignal[] = [
     {
-      label: "Mock momentum (demo)",
+      label: momLabel,
       value: `${momentum}%`,
-      detail: "Illustrative only — not calculated from live prices.",
+      detail: momDetail,
     },
     {
-      label: "Mock volatility index",
+      label: crypto ? "Mock volatility (crypto demo)" : "Mock volatility index",
       value: vol,
-      detail: "Higher = more swing risk in this toy model.",
+      detail: volDetail,
     },
     {
-      label: "Mock RSI-style read",
+      label: crypto ? "Mock RSI-style (pair)" : "Mock RSI-style read",
       value: String(rsi),
-      detail: "Educational placeholder, not a trading signal.",
+      detail: rsiDetail,
     },
   ];
+
+  const note = crypto
+    ? `Demo seed: ${seed}. Yahoo-style symbol ${upper} (e.g. BTC-USD for Bitcoin spot vs USD) — still mock math.`
+    : `Demo seed: ${seed} (same ticker + horizon → same mock output).`;
+
+  const summary =
+    btc
+      ? sentiment === "bullish"
+        ? "In this demo model, Bitcoin (USD pair) momentum tilts slightly positive — not live BTC; not financial advice."
+        : sentiment === "bearish"
+          ? "In this demo model, Bitcoin (USD pair) momentum tilts slightly negative — illustrative only."
+          : "In this demo model, Bitcoin (USD pair) reads near the middle — no real forecast implied."
+      : crypto
+        ? sentiment === "bullish"
+          ? "In this demo model, this crypto/USD pair tilts slightly positive — still meaningless for real trading."
+          : sentiment === "bearish"
+            ? "In this demo model, this crypto/USD pair tilts slightly negative — purely illustrative."
+            : "In this demo model, this crypto/USD pair sits near the middle — no forecast implied."
+        : sentiment === "bullish"
+          ? "In this demo model, momentum tilts slightly positive — still meaningless for real trading."
+          : sentiment === "bearish"
+            ? "In this demo model, momentum tilts slightly negative — purely illustrative."
+            : "In this demo model, readings sit near the middle — no real forecast implied.";
 
   return {
     ticker: upper,
     horizon,
     sentiment: sentiment as "bullish" | "bearish" | "neutral",
     signals,
-    mockSeedNote: `Demo seed: ${seed} (same ticker + horizon → same mock output).`,
+    mockSeedNote: note,
+    summary,
   };
 }
