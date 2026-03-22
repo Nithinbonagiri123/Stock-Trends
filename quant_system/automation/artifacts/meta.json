@@ -1,0 +1,4 @@
+{
+  "lookback": 60,
+  "keras_path": "model.keras"
+}
