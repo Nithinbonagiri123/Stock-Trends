@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python / quant data (regenerate locally; large binaries break HTTP pushes)
+**/__pycache__/
+*.py[cod]
+indian_nse_predictor/data_store/
+indian_nse_predictor/artifacts/
+quant_multivariate/artifacts/
+quant_system/**/artifacts/
